@@ -7,15 +7,49 @@ export default function App() {
 
   const BLANKGUESSES = (["     ", "     ", "     ", "     ", "     "]);
 
+  let maxTime = 90;
+  let minutes = parseInt(maxTime / 60, 10);
+  let seconds = parseInt(maxTime % 60, 10);
+
+  minutes = minutes < 10 ? "0" + minutes : minutes;
+  seconds = seconds < 10 ? "0" + seconds : seconds;
+  
+
   const [name, setName] = React.useState("");
   const [index, setIndex] = React.useState(0);
   const [guesses, setGuesses] = React.useState(BLANKGUESSES);
   const [answer, setAnswer] = React.useState(WORDS[Math.floor(Math.random() * WORDS.length)]);
+  const [clock, setClock] = React.useState(minutes + ":" + seconds);
 
-  
+  var intervalId = null;
+
+  function startTimer() {
+    // let timer = maxTime;
+    intervalId = setInterval(function () {
+        
+        minutes = parseInt(maxTime / 60, 10);
+        seconds = parseInt(maxTime % 60, 10);
+
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        setClock(minutes + ":" + seconds);
+
+        if (--maxTime < 0) {
+            alert("Time ran out! Word was " + answer);
+            resetGame();
+            
+            
+        }
+
+    }, 1000);
+}
 
   function handleTextSubmit() {
-
+    if (index === 0) {
+      startTimer();
+    }
     //check if word is correct length
     if (name.length != 5) {
       alert("Invalid Word Length")
@@ -41,9 +75,15 @@ export default function App() {
 
   //TODO: RESET GAME
   function resetGame() {
+    
+    clearInterval(intervalId);
+    setName("");
     setGuesses(BLANKGUESSES);
-    setAnswer(WORDS[Math.floor(Math.random() * WORDS.length)]);
     setIndex(0);
+    
+    
+
+    setAnswer(WORDS[Math.floor(Math.random() * WORDS.length)]);
   }
 
   //check if word has been found or guesses have run out. 
@@ -96,6 +136,7 @@ export default function App() {
   return (
     <View style={styles.style1}>
       <Text style={styles.title}>SpeedWordle</Text>
+      <Text style={styles.timer}>{clock}</Text>
       <BlockRow guess={guesses[0]}/>
       <BlockRow guess={guesses[1]}/>
       <BlockRow guess={guesses[2]}/>
@@ -182,6 +223,9 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
   textInput: {
+    color: '#FFFFFF',
+  },
+  timer: {
     color: '#FFFFFF',
   },
 });
