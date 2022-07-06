@@ -73,7 +73,7 @@ export default function App() {
     
   }
 
-  //TODO: RESET GAME
+  //resets game
   function resetGame() {
     
     clearInterval(intervalId);
