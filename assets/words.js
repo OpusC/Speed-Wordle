@@ -4867,7 +4867,6 @@ export const WORDS = [
     'busby',
     'wheal',
     'buffo',
-    'yobbo',
     'biles',
     'poxes',
     'rooty',
