@@ -8,7 +8,7 @@ export default function App() {
 
   const BLANKGUESSES = (["     ", "     ", "     ", "     ", "     "]);
 
-  let maxTime = 90;
+  let maxTime = 15;
   let minutes = parseInt(maxTime / 60, 10);
   let seconds = parseInt(maxTime % 60, 10);
 
@@ -23,7 +23,7 @@ export default function App() {
   const [clock, setClock] = React.useState(minutes + ":" + seconds);
   const [menu, setMenu] = React.useState(false);
 
-  var intervalId = null;
+  var intervalId;
 
   function startTimer() {
     // let timer = maxTime;
@@ -41,9 +41,9 @@ export default function App() {
       if (--maxTime < 0) {
         alert("Time ran out! Word was " + answer);
         resetGame();
-
-
       }
+
+
 
     }, 1000);
   }
@@ -78,25 +78,29 @@ export default function App() {
   //resets game
   function resetGame() {
 
+    setClock(minutes + ":" + seconds);
+    setIndex(0);
     clearInterval(intervalId);
+    setClock()
     setName("");
     setGuesses(BLANKGUESSES);
-    setIndex(0);
+    
 
 
 
     setAnswer(WORDS[Math.floor(Math.random() * WORDS.length)]);
   }
 
-  //check if word has been found or guesses have run out. 
+  //check if word has been found
   function checkGameState() {
     if (guesses.includes(answer)) {
       alert("Winner winner chicken dinner!");
       resetGame();
     } else if (guesses[4] != "     ") {
-      alert('You lost! Word was ' + answer);
+      alert("Ran out of guesses!");
       resetGame();
     }
+
   }
 
   const BlockRow = ({
