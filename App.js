@@ -6,51 +6,62 @@ import { Button, Modal } from "react-native";
 
 export default function App() {
 
-  const BLANKGUESSES = (["     ", "     ", "     ", "     ", "     "]);
+  const BLANKGUESSES = (["     ", "     ", "     ", "     ", "     "])
 
-  let maxTime = 90;
-  let minutes = parseInt(maxTime / 60, 10);
-  let seconds = parseInt(maxTime % 60, 10);
 
-  minutes = minutes < 10 ? "0" + minutes : minutes;
-  seconds = seconds < 10 ? "0" + seconds : seconds;
+  //initial timer setup
+  const DEFAULT_MAX_TIME = 300;
+  const [maxTime, setMaxTime] = React.useState(DEFAULT_MAX_TIME)
+  let minutes = parseInt(maxTime / 60, 10)
+  let seconds = parseInt(maxTime % 60, 10)
+  minutes = minutes < 10 ? "0" + minutes : minutes
+  seconds = seconds < 10 ? "0" + seconds : seconds
+  const [timer, setTimer] = React.useState(minutes + ":" + seconds)
+  const [count, setCount] = React.useState(maxTime);
 
 
   const [name, setName] = React.useState("");
   const [index, setIndex] = React.useState(0);
   const [guesses, setGuesses] = React.useState(BLANKGUESSES);
   const [answer, setAnswer] = React.useState(WORDS[Math.floor(Math.random() * WORDS.length)]);
-  const [clock, setClock] = React.useState(minutes + ":" + seconds);
   const [menu, setMenu] = React.useState(false);
+  const [timeChangeMenu, setTimeChangeMenu] = React.useState(false)
 
-  var intervalId = null;
-
-  function startTimer() {
-    // let timer = maxTime;
-    intervalId = setInterval(function () {
-
-      minutes = parseInt(maxTime / 60, 10);
-      seconds = parseInt(maxTime % 60, 10);
-
-
+  React.useEffect(() => {
+    if (index === 0) {
+      setCount(maxTime)
+      minutes = parseInt((count) / 60, 10)
+      seconds = parseInt((count) % 60, 10)
       minutes = minutes < 10 ? "0" + minutes : minutes;
       seconds = seconds < 10 ? "0" + seconds : seconds;
+      setTimer(minutes + ":" + seconds)
+    }
+  })
 
-      setClock(minutes + ":" + seconds);
+  React.useEffect(() => {
+    let interval = null;
 
-      if (--maxTime < 0) {
-        alert("Time ran out! Word was " + answer);
-        resetGame();
+    if (index > 0 && !(index >= 5) && count > 0) {
+      interval = setInterval(() => {
+        setCount(count => count - 1);
 
+        minutes = parseInt((count - 1) / 60, 10)
+        seconds = parseInt((count - 1) % 60, 10)
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+        setTimer(minutes + ":" + seconds)
 
-      }
-
-    }, 1000);
-  }
+      }, 1000);
+    } else if (count <= 0) {
+      alert('You lost! Word was ' + answer);
+      clearInterval(interval)
+      resetGame()
+    }
+    return () => clearInterval(interval);
+  }, [index, count]);
 
   function handleTextSubmit() {
     if (index === 0) {
-      startTimer();
     }
     //check if word is correct length
     if (name.length != 5) {
@@ -77,21 +88,20 @@ export default function App() {
 
   //resets game
   function resetGame() {
-
-    clearInterval(intervalId);
-    setName("");
-    setGuesses(BLANKGUESSES);
-    setIndex(0);
-
-
-
-    setAnswer(WORDS[Math.floor(Math.random() * WORDS.length)]);
+    setName("")
+    setGuesses(BLANKGUESSES)
+    setIndex(0)
+    setCount(maxTime)
+    minutes = parseInt(maxTime / 60, 10)
+    seconds = parseInt(maxTime % 60, 10)
+    setTimer(minutes + ":" + seconds)
+    setAnswer(WORDS[Math.floor(Math.random() * WORDS.length)])
   }
 
   //check if word has been found or guesses have run out. 
   function checkGameState() {
     if (guesses.includes(answer)) {
-      alert("Winner winner chicken dinner!");
+      alert("Winner winner chicken dinner! Time was " + timer);
       resetGame();
     } else if (guesses[4] != "     ") {
       alert('You lost! Word was ' + answer);
@@ -143,10 +153,10 @@ export default function App() {
       <Modal visible={menu} transparent={true}>
         <View style={styles.menu}>
           <Text style={styles.textStyle}>
-            menu
+            Settings
           </Text>
           <View style={styles.button}>
-            <Button title="Change Time" />
+            <Button title="Change Time" onPress={() => {setMenu(!menu), setTimeChangeMenu(!timeChangeMenu)}}/>
           </View>
           <View style={styles.button}>
             <Button title="Change Mode" />
@@ -156,8 +166,17 @@ export default function App() {
           </View>
         </View>
       </Modal>
+      <Modal visible={timeChangeMenu} transparent={true}>
+        <View style={styles.menu}>
+          <Text style={styles.textStyle}>
+          Change Time
+          </Text>
+          <Button title="5 minutes" onPress={() => {setMaxTime(300), setTimeChangeMenu(!timeChangeMenu)}}/>
+          <Button title="10 minutes" onPress={() => {setMaxTime(600), setTimeChangeMenu(!timeChangeMenu)}}/>
+        </View>
+      </Modal>
       <Text style={styles.title}>SpeedWordle</Text>
-      <Text style={styles.timer}>{clock}</Text>
+      <Text style={styles.timer}>{timer}</Text>
       <View style={{display: "flex", justifyContent: "stretch", flexDirection: "column", alignSelf: "center"}}>
         <BlockRow guess={guesses[0]} />
         <BlockRow guess={guesses[1]} />
