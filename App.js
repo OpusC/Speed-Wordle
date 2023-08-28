@@ -1,8 +1,10 @@
 import React from "react";
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { WORDS } from './assets/words.js'
 import { Button, Modal } from "react-native";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+
 
 export default function App() {
 
@@ -146,7 +148,8 @@ export default function App() {
   }
 
   return (
-    <View style={styles.style1}>
+    <ScrollView contentContainerStyle={styles.style1}>
+      <KeyboardAwareScrollView contentContainerStyle={styles.style1}>
       <View style={{ justifyContent: "flex-start" }}>
         <Button title="menu" onPress={() => { setMenu(!menu) }} />
       </View>
@@ -194,8 +197,9 @@ export default function App() {
         />
       </View>
 
-      <StatusBar style="auto" />
-    </View>
+      <StatusBar style="light" />
+      </KeyboardAwareScrollView>
+    </ScrollView>
   );
 }
 
@@ -210,6 +214,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#121212',
     alignItems: 'center',
+    paddingTop: 10
 
   },
   style2: {
